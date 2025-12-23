@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>걷는 자연</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#e9f2e6">
+<style>
+body{margin:0;font-family:sans-serif;background:#e9f2e6;text-align:center}
+#status{padding:10px;font-size:14px;opacity:.8}
+#world{height:50vh;background:linear-gradient(#cde6c7,#b7d9d3);display:flex;align-items:center;justify-content:center}
+#capture{display:none;position:fixed;inset:0;background:#eef3ec;padding-top:30vh}
+button{padding:12px 20px;font-size:16px;margin:10px}
+#capture {
+  background: url("capture-real.jpg") center/cover no-repeat;}
+</style>
+</head>
+<body>
+<div id="status">GPS 대기중…</div>
+<div id="world">계속 걷고 있어요</div>
+<div id="capture">
+<div>조심히 다가간다…</div>
+<button onclick="tryCatch()">잡기</button>
+<button onclick="endCapture(false)">보내기</button>
+</div>
+<script>
+let lastPos=null;let stable=true;
+navigator.geolocation.watchPosition(pos=>{
+ if(!lastPos){lastPos=pos.coords;document.getElementById("status").textContent="걷고 있어요";return;}
+ const d=Math.abs(pos.coords.latitude-lastPos.latitude)+Math.abs(pos.coords.longitude-lastPos.longitude);
+ if(d>0.0001&&Math.random()<0.3){startEncounter();}
+ lastPos=pos.coords;
+});
+window.addEventListener("deviceorientation",e=>{stable=Math.abs(e.gamma)<10;});
+function startEncounter(){
+ document.getElementById("status").textContent="…기척이 느껴진다";
+ setTimeout(()=>{document.getElementById("capture").style.display="block";},800);
+}
+function tryCatch(){const success=stable&&Math.random()<0.7;endCapture(success);}
+function endCapture(success){
+ document.getElementById("capture").style.display="none";
+ document.getElementById("status").textContent=success?"작은 흔적이 남았다":"조용히 사라졌다";
+}
+</script>
+</body>
+</html>
